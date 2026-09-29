@@ -203,10 +203,21 @@ namespace TARge25Shop.SpaceshipTest
         public async Task ShouldNot_RemoveSpaceshipFromDatabase_WhenSpaceshipIdIsDifferent()
         {
             //ülesseade
-            SpaceshipDto dto = MockSpaceshipData();
+            var dto = MockSpaceshipData();
+            Guid wrongID = Guid.NewGuid();
 
             //tegevus
-            var spaceship = await Svc<ISpaceshipServices>().Create(dto);
+            var createdSpaceship = await Svc<ISpaceshipServices>().Create(dto);
+            var spaceshipDeleted = await Svc<ISpaceshipServices>().Delete(wrongID);
+            var spaceshipindb = await Svc<ISpaceshipServices>().DetailAsync(createdSpaceship.Id);
+
+            //kontroll
+            Assert.NotNull(spaceshipindb);
+            Assert.NotEqual(dto.Id, wrongID);
+            Assert.Equal(createdSpaceship, spaceshipindb);
+
+
+          
 
         }
 

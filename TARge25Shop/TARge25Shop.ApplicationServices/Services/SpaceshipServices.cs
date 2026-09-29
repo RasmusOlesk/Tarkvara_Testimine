@@ -105,5 +105,10 @@ namespace TARge25Shop.ApplicationServices.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<object?> DetailAsync(Guid? id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
