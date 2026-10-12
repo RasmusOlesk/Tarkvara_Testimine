@@ -281,6 +281,36 @@ namespace TARge25Shop.KindergartenTest
             Assert.True(result.ChildrenCount > 0);
         }
 
+        [Fact]
+        public async Task ShouldNot_UpdateKindergarten_WhenChildrenCountNegative()
+        {
+
+        }
+
+        [Fact]
+        public async Task ShouldNot_UpdateKindergarten_WhenChildrenCountIsThreeOrLess()
+        {
+
+        }
+
+        [Fact]
+        public async Task ShouldNot_UpdateKindergarten_WhenGroupNameIsEmpty()
+        {
+
+        }
+
+        [Fact]
+        public async Task ShouldNot_UpdateKindergarten_WhenKindergartenNameIsEmpty()
+        {
+
+        }
+
+        [Fact]
+        public async Task ShouldNot_UpdateKindergarten_WhenTeacherNameIsEmpty()
+        {
+
+        }
+
 
         /* üleval testid, all abimeetodid */
 
