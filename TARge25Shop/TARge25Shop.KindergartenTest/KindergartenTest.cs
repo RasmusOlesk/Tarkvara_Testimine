@@ -253,6 +253,34 @@ namespace TARge25Shop.KindergartenTest
             };
         }
 
+        //ISESEISVALT TEHTUD TESTID
+
+        [Fact]
+        public async Task Should_CreateKindergarten_WhenChildrenCountIsThreeOrMore()
+        {
+            //ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            dto.ChildrenCount = 2;
+            //tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+            //kontroll
+            Assert.True(result.ChildrenCount < 3);
+        }
+
+        [Fact]
+        public async Task Should_CreateKindergartenWithPositiveChildrenCount_WhenChildrenCountPositive()
+        {
+            //ülesseade
+            KindergartenDto dto = MockKindergartenData(false);
+            dto.ChildrenCount = (dto.ChildrenCount * 2);
+
+            //tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+
+            //kontroll
+            Assert.True(result.ChildrenCount > 0);
+        }
+
 
         /* üleval testid, all abimeetodid */
 
