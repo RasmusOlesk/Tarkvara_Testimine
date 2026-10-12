@@ -10,6 +10,7 @@ using TARge25Shop.Core.ServiceInterface;
 using TARge25Shop.Data;
 using TARge25Shop.SpaceshipTest.Macros;
 using TARge25Shop.SpaceshipTest.Mock;
+using TARge25SHop.Core.ServiceInterface;
 
 namespace TARge25Shop.SpaceshipTest
 {

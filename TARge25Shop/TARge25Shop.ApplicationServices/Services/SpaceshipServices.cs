@@ -3,6 +3,7 @@ using TARge25Shop.Core.Domain;
 using TARge25Shop.Core.Dto;
 using TARge25Shop.Core.ServiceInterface;
 using TARge25Shop.Data;
+using TARge25SHop.Core.ServiceInterface;
 
 
 namespace TARge25Shop.ApplicationServices.Services

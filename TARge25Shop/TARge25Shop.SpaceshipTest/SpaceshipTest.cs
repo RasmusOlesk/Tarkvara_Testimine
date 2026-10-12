@@ -118,10 +118,10 @@ namespace TARge25Shop.SpaceshipTest
 
             SpaceshipDto dto = MockSpaceshipData();
             var result = await Svc<ISpaceshipServices>().Create(dto);
-            //var guid = new Guid("68eb8abd-086a-4c8b-9695-71234143f709");
+            var guid = new Guid("68eb8abd-086a-4c8b-9695-71234143f709");
 
 
-            Guid guid = (Guid)result.Id;
+            
             SpaceshipDto domain = new();
 
             domain.Id = Guid.Parse("68eb8abd-086a-4c8b-9695-71234143f709");

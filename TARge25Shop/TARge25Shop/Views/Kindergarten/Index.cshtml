@@ -1,0 +1,48 @@
+﻿@model IEnumerable<TARge25Shop.Models.Kindergarten.KindergartenIndexViewModel>
+
+<div>
+    <a asp-action="create" asp-controller="kindergarten" type="submit" class="btn btn-primary">Create</a>
+</div>
+
+@{
+    short rowNumber = 1;
+}
+
+
+<div class="h1">
+    Kindergartens
+</div>
+<form method="get">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Nr</th>
+                <th scope="col">Group Name</th>
+                <th scope="col">Kindergarten Name</th>
+                <th scope="col">Teacher Name</th>
+                <th scope="col">Children Count</th>
+                <th scope="col">Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var kindergarten in Model)
+            {
+                <tr>
+                    <td>@rowNumber</td>
+                    <td>@kindergarten.GroupName</td>
+                    <td>@kindergarten.KindergartenName</td>
+                    <td>@kindergarten.TeacherName</td>
+                    <td>@kindergarten.ChildrenCount</td>
+                    <td>@kindergarten.CreatedAt</td>
+                    <td>
+                        <a asp-action="details" asp-controller="kindergarten" asp-route-id="@kindergarten.Id" class="btn btn-primary">Details</a>
+                        <a asp-action="update" asp-controller="kindergarten" asp-route-id="@kindergarten.Id" class="btn btn-primary">Update</a>
+                        <a asp-action="delete" asp-controller="kindergarten" asp-route-id="@kindergarten.Id" class="btn btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+                rowNumber += 1;
+            }
+        </tbody>
+    </table>
+</form>
+

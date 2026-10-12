@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TARge25Shop.ApplicationServices.Services;
 using TARge25Shop.Core.ServiceInterface;
 using TARge25Shop.Data;
+using TARge25SHop.Core.ServiceInterface;
 
 namespace TARge25Shop
 {
@@ -14,6 +15,7 @@ namespace TARge25Shop
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddScoped<IKindergartenServices, KindergartenServices>();
             builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();
             builder.Services.AddScoped<IFileServices, FileServices>();
 
