@@ -289,13 +289,13 @@ namespace TARge25Shop.KindergartenTest
         {
             // Ülesseade
             KindergartenDto dto = MockKindergartenData();
-            dto.GroupName = "Mesimummud";
+            dto.GroupName = "Bumblebee";
 
             // Tegevus
             var result = await Svc<IKindergartenServices>().Create(dto);
 
             // Kontroll
-            Assert.Equal("Mesimummud", result.GroupName);
+            Assert.Equal("Bumblebee", result.GroupName);
         }
 
         // TEST 2
@@ -304,13 +304,13 @@ namespace TARge25Shop.KindergartenTest
         {
             // Ülesseade
             KindergartenDto dto = MockKindergartenData();
-            dto.KindergartenName = "Päikese Lasteaed";
+            dto.KindergartenName = "Place";
 
             // Tegevus
             var result = await Svc<IKindergartenServices>().Create(dto);
 
             // Kontroll
-            Assert.Equal("Päikese Lasteaed", result.KindergartenName);
+            Assert.Equal("Place", result.KindergartenName);
         }
 
         // TEST 3
@@ -319,13 +319,13 @@ namespace TARge25Shop.KindergartenTest
         {
             // Ülesseade
             KindergartenDto dto = MockKindergartenData();
-            dto.TeacherName = "Mari";
+            dto.TeacherName = "Peedu";
 
             // Tegevus
             var result = await Svc<IKindergartenServices>().Create(dto);
 
             // Kontroll
-            Assert.Equal("Mari", result.TeacherName);
+            Assert.Equal("Peedu", result.TeacherName);
         }
 
         // TEST 4
@@ -394,7 +394,7 @@ namespace TARge25Shop.KindergartenTest
         {
             // Ülesseade
             KindergartenDto dto = MockKindergartenData();
-            dto.GroupName = "Lepatriinud";
+            dto.GroupName = "Bugs";
             var created = await Svc<IKindergartenServices>().Create(dto);
 
             // Tegevus
@@ -402,7 +402,7 @@ namespace TARge25Shop.KindergartenTest
                 .DetailAsync((Guid)created.Id);
 
             // Kontroll
-            Assert.Equal("Lepatriinud", result.GroupName);
+            Assert.Equal("Bugs", result.GroupName);
         }
 
         // TEST 9
@@ -431,7 +431,7 @@ namespace TARge25Shop.KindergartenTest
                 Id = id,
                 GroupName = created.GroupName,
                 KindergartenName = created.KindergartenName,
-                TeacherName = "Katrin",
+                TeacherName = "Aadu",
                 ChildrenCount = created.ChildrenCount,
                 CreatedAt = created.CreatedAt,
                 UpdatedAt = DateTime.UtcNow
@@ -441,7 +441,7 @@ namespace TARge25Shop.KindergartenTest
             var result = await Svc<IKindergartenServices>().DetailAsync(id);
 
             // Kontroll
-            Assert.Equal("Katrin", result.TeacherName);
+            Assert.Equal("Aadu", result.TeacherName);
         }
 
         // TEST 10
@@ -506,7 +506,7 @@ namespace TARge25Shop.KindergartenTest
             // Ülesseade
             KindergartenDto dto1 = MockKindergartenData();
             KindergartenDto dto2 = MockKindergartenData();
-            dto2.GroupName = "Mesilased";
+            dto2.GroupName = "bees";
 
             // Tegevus
             var result1 = await Svc<IKindergartenServices>().Create(dto1);
@@ -524,8 +524,8 @@ namespace TARge25Shop.KindergartenTest
             // Ülesseade
             KindergartenDto dto = new KindergartenDto
             {
-                GroupName = "Tibud",
-                KindergartenName = "Vikerkaare Lasteaed",
+                GroupName = "Chicken",
+                KindergartenName = "Rainbow",
                 TeacherName = "Anna",
                 ChildrenCount = 15,
                 CreatedAt = new DateTime(2025, 3, 1),
@@ -537,8 +537,8 @@ namespace TARge25Shop.KindergartenTest
 
             // Kontroll
             Assert.NotNull(result);
-            Assert.Equal("Tibud", result.GroupName);
-            Assert.Equal("Vikerkaare Lasteaed", result.KindergartenName);
+            Assert.Equal("Chicken", result.GroupName);
+            Assert.Equal("Rainbow", result.KindergartenName);
             Assert.Equal("Anna", result.TeacherName);
             Assert.Equal(15, result.ChildrenCount);
 
@@ -555,8 +555,8 @@ namespace TARge25Shop.KindergartenTest
             {
                 return new KindergartenDto
                 {
-                    GroupName = "Päkapiud",
-                    KindergartenName = "lendav taldrik",
+                    GroupName = "Päkapikk",
+                    KindergartenName = "UFO",
                     TeacherName = "Peeter",
                     ChildrenCount = 69,
                     CreatedAt = DateTime.Now,
@@ -568,7 +568,7 @@ namespace TARge25Shop.KindergartenTest
                 return new KindergartenDto
                 {
                     GroupName = "RAKETT69",
-                    KindergartenName = "lendav kauss",
+                    KindergartenName = "UFO",
                     TeacherName = "Aadu",
                     ChildrenCount = 420,
                     CreatedAt = DateTime.Now,
