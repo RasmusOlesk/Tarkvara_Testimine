@@ -100,15 +100,5 @@ namespace TARge25Shop.ApplicationServices.Services
 
             return result;
         }
-
-        public Task Create(object dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<object?> DetailAsync(Guid? id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using TARge25Shop.Core.Dto;
 using TARge25Shop.Core.ServiceInterface;
@@ -10,7 +11,7 @@ namespace TARge25Shop.SpaceshipTest
     public class SpaceshipTest : TestBase
     {
 
-        [Fact]
+        [Fact] 
         // Fact tähistab ära ühte testi xUnit raamistikus
         // 1 - Kirjeldatakse ära kas test on tavaline, või negatiivne.
         // 2 - Kirjeldatakse ära mida parasjagu üritatakse testialuse objektiga teha
@@ -24,8 +25,8 @@ namespace TARge25Shop.SpaceshipTest
         public async Task ShouldNot_AddEmptySpaceShip_WhenResultIsReturned()
         {
             // Ülesseade
-            SpaceshipDto dto = new SpaceshipDto()
-            {
+            SpaceshipDto dto = new SpaceshipDto() 
+            { 
                 Name = "X AE a L 12 menuornvöerv",
                 ShipType = "lendav taldrik",
                 Crew = 67,
@@ -110,10 +111,17 @@ namespace TARge25Shop.SpaceshipTest
         public async Task Should_UpdateSpaceshipByID_WhenUpdatingData()
         {
             //ülesseade
-            var guid = new Guid("68eb8abd-086a-4c8b-9695-71234143f709");
+
+            //add new object,
+            //extract id from result
+            //update new object by result id
 
             SpaceshipDto dto = MockSpaceshipData();
+            var result = await Svc<ISpaceshipServices>().Create(dto);
+            //var guid = new Guid("68eb8abd-086a-4c8b-9695-71234143f709");
 
+
+            Guid guid = (Guid)result.Id;
             SpaceshipDto domain = new();
 
             domain.Id = Guid.Parse("68eb8abd-086a-4c8b-9695-71234143f709");
@@ -126,6 +134,7 @@ namespace TARge25Shop.SpaceshipTest
 
             //tegevus
             await Svc<ISpaceshipServices>().Update(dto);
+            var result2 = await Svc<ISpaceshipServices>().DetailAsync(guid);
 
             //kontroll
             Assert.Equal(domain.Id, guid);
@@ -139,7 +148,7 @@ namespace TARge25Shop.SpaceshipTest
         [Fact]
         public async Task ShouldNot_UpdateSpaceshipByID_WhenNoDataIsUpdated()
         {
-            //üleseade
+            //ülesseade
             SpaceshipDto dto = MockSpaceshipData();
             var createdSpaceship = await Svc<ISpaceshipServices>().Create(dto);
 
@@ -150,11 +159,10 @@ namespace TARge25Shop.SpaceshipTest
             //kontroll
             Assert.NotEqual(createdSpaceship.Id, result.Id);
         }
-
-
-        //kuna mootor ei saa olla negatiivne võimsusega, kontrollime
+        //kuna mootor ei saa olla negatiivse võimsusega, kontrollime et ei saaks
+        //lisada võimetut mootorit ega negatiivse võimsusega mootorit
         [Fact]
-        public async Task shouldNot_CreateSpaceshipWithNegativeEnginePower_WhenEnginePowerNegative()
+        public async Task ShouldNot_CreateSpaceshipWithNegativeEnginePower_WhenEnginePowerNegative()
         {
             //ülesseade
             SpaceshipDto dto = MockSpaceshipData(true);
@@ -170,21 +178,20 @@ namespace TARge25Shop.SpaceshipTest
         //test mis kontrollib, et meeskond on suurem kui 3 liiget,
         //service ei tohi lisada sellest vähema arvuga objekti, service
         //võib selle probleemi lahendada ükskõik kuidas
-
         [Fact]
-        public async Task ShouldNot_CreateSpaceshipWithCrewSmallerThanThree()
+        public async Task ShouldNot_CreateSpaceship_WhenCrewIsThreeOrLess()
         {
             //ülesseade
             SpaceshipDto dto = MockSpaceshipData();
             dto.Crew = 0;
-            //Tegevus
+            //tegevus
             var result = await Svc<ISpaceshipServices>().Create(dto);
-            //Kontroll
+            //kontroll
             Assert.True(result.Crew > 3);
         }
 
         [Fact]
-        public async Task  Should_RemoveSpaceshipfromDatabase_WhenSpaceshipIsDeleted()
+        public async Task Should_RemoveSpaceshipFromDatabase_WhenSpaceshipIsDeleted()
         {
             //ülesseade
             SpaceshipDto dto = MockSpaceshipData();
@@ -202,30 +209,24 @@ namespace TARge25Shop.SpaceshipTest
         [Fact]
         public async Task ShouldNot_RemoveSpaceshipFromDatabase_WhenSpaceshipIdIsDifferent()
         {
-            //ülesseade
             var dto = MockSpaceshipData();
-            Guid wrongID = Guid.NewGuid();
-
-            //tegevus
-            var createdSpaceship = await Svc<ISpaceshipServices>().Create(dto);
-            var spaceshipDeleted = await Svc<ISpaceshipServices>().Delete(wrongID);
-            var spaceshipindb = await Svc<ISpaceshipServices>().DetailAsync(createdSpaceship.Id);
+            var createdSpaceship1 = await Svc<ISpaceshipServices>().Create(dto);
+            var createdSpaceship2 = await Svc<ISpaceshipServices>().Create(dto);
+            var deleteResult = await Svc<ISpaceshipServices>().Delete((Guid)createdSpaceship2.Id);
+            var spaceshipindb = await Svc<ISpaceshipServices>().DetailAsync((Guid)createdSpaceship1.Id);
 
             //kontroll
             Assert.NotNull(spaceshipindb);
-            Assert.NotEqual(dto.Id, wrongID);
-            Assert.Equal(createdSpaceship, spaceshipindb);
-
-
-          
-
+            Assert.NotEqual(deleteResult.Id, createdSpaceship1.Id);
+            Assert.Equal(createdSpaceship1, spaceshipindb);
         }
+
+
 
         /// <summary>
         /// Returns a nulled object for testing purposes
         /// </summary>
         /// <returns></returns>
-
         private SpaceshipDto MockSpaceshipNullData()
         {
             return new SpaceshipDto
@@ -239,6 +240,7 @@ namespace TARge25Shop.SpaceshipTest
                 UpdatedAt = DateTime.MinValue,
             };
         }
+
 
         /* üleval testid, all abimeetodid */
 
@@ -269,5 +271,6 @@ namespace TARge25Shop.SpaceshipTest
                 };
             }
         }
+
     }
 }
