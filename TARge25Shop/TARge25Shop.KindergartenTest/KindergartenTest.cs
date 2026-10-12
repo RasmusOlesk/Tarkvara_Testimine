@@ -281,36 +281,269 @@ namespace TARge25Shop.KindergartenTest
             Assert.True(result.ChildrenCount > 0);
         }
 
+        // TEST 1
         [Fact]
-        public async Task ShouldNot_UpdateKindergarten_WhenChildrenCountNegative()
+        public async Task Should_CreateKindergarten_WhenGroupNameIsProvided()
         {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            dto.GroupName = "Mesimummud";
 
+            // Tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.Equal("Mesimummud", result.GroupName);
         }
 
+        // TEST 2
         [Fact]
-        public async Task ShouldNot_UpdateKindergarten_WhenChildrenCountIsThreeOrLess()
+        public async Task Should_CreateKindergarten_WhenKindergartenNameIsProvided()
         {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            dto.KindergartenName = "Päikese Lasteaed";
 
+            // Tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.Equal("Päikese Lasteaed", result.KindergartenName);
         }
 
+        // TEST 3
         [Fact]
-        public async Task ShouldNot_UpdateKindergarten_WhenGroupNameIsEmpty()
+        public async Task Should_CreateKindergarten_WhenTeacherNameIsProvided()
         {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            dto.TeacherName = "Mari";
 
+            // Tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.Equal("Mari", result.TeacherName);
         }
 
+        // TEST 4
         [Fact]
-        public async Task ShouldNot_UpdateKindergarten_WhenKindergartenNameIsEmpty()
+        public async Task Should_CreateKindergarten_WhenChildrenCountIsTen()
         {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            dto.ChildrenCount = 10;
 
+            // Tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.Equal(10, result.ChildrenCount);
         }
 
+        // TEST 5
         [Fact]
-        public async Task ShouldNot_UpdateKindergarten_WhenTeacherNameIsEmpty()
+        public async Task Should_CreateKindergarten_WhenCreatedAtIsProvided()
         {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
 
+            // Tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.NotEqual(DateTime.MinValue, result.CreatedAt);
         }
 
+        // TEST 6
+        [Fact]
+        public async Task Should_CreateKindergarten_WhenUpdatedAtIsProvided()
+        {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+
+            // Tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.NotEqual(DateTime.MinValue, result.UpdatedAt);
+        }
+
+        // TEST 7
+        [Fact]
+        public async Task Should_GetKindergartenByID_WhenKindergartenExists()
+        {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            var created = await Svc<IKindergartenServices>().Create(dto);
+
+            // Tegevus
+            var result = await Svc<IKindergartenServices>()
+                .DetailAsync((Guid)created.Id);
+
+            // Kontroll
+            Assert.NotNull(result);
+            Assert.Equal(created.Id, result.Id);
+        }
+
+        // TEST 8
+        [Fact]
+        public async Task Should_GetKindergartenWithCorrectGroupName_WhenKindergartenExists()
+        {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            dto.GroupName = "Lepatriinud";
+            var created = await Svc<IKindergartenServices>().Create(dto);
+
+            // Tegevus
+            var result = await Svc<IKindergartenServices>()
+                .DetailAsync((Guid)created.Id);
+
+            // Kontroll
+            Assert.Equal("Lepatriinud", result.GroupName);
+        }
+
+        // TEST 9
+        [Fact]
+        public async Task Should_UpdateKindergartenTeacherName_WhenTeacherNameChanges()
+        {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            var created = await Svc<IKindergartenServices>().Create(dto);
+            Guid id = (Guid)created.Id;
+
+            // Eemaldame objekti EF Core'i jälgimisest
+            var dbContext = Svc<TARge25ShopContext>();
+            var trackedEntity = dbContext.Kindergartens.Local
+                .FirstOrDefault(x => x.Id == id);
+
+            if (trackedEntity != null)
+            {
+                dbContext.Entry(trackedEntity).State =
+                    Microsoft.EntityFrameworkCore.EntityState.Detached;
+            }
+
+            // Tegevus
+            KindergartenDto updateDto = new KindergartenDto
+            {
+                Id = id,
+                GroupName = created.GroupName,
+                KindergartenName = created.KindergartenName,
+                TeacherName = "Katrin",
+                ChildrenCount = created.ChildrenCount,
+                CreatedAt = created.CreatedAt,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await Svc<IKindergartenServices>().Update(updateDto);
+            var result = await Svc<IKindergartenServices>().DetailAsync(id);
+
+            // Kontroll
+            Assert.Equal("Katrin", result.TeacherName);
+        }
+
+        // TEST 10
+        [Fact]
+        public async Task Should_UpdateKindergartenChildrenCount_WhenChildrenCountChanges()
+        {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            var created = await Svc<IKindergartenServices>().Create(dto);
+            Guid id = (Guid)created.Id;
+
+            var dbContext = Svc<TARge25ShopContext>();
+            var trackedEntity = dbContext.Kindergartens.Local
+                .FirstOrDefault(x => x.Id == id);
+
+            if (trackedEntity != null)
+            {
+                dbContext.Entry(trackedEntity).State =
+                    Microsoft.EntityFrameworkCore.EntityState.Detached;
+            }
+
+            // Tegevus
+            KindergartenDto updateDto = new KindergartenDto
+            {
+                Id = id,
+                GroupName = created.GroupName,
+                KindergartenName = created.KindergartenName,
+                TeacherName = created.TeacherName,
+                ChildrenCount = 25,
+                CreatedAt = created.CreatedAt,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await Svc<IKindergartenServices>().Update(updateDto);
+            var result = await Svc<IKindergartenServices>().DetailAsync(id);
+
+            // Kontroll
+            Assert.Equal(25, result.ChildrenCount);
+        }
+
+        // TEST 11
+        [Fact]
+        public async Task Should_DeleteKindergarten_WhenValidIDIsProvided()
+        {
+            // Ülesseade
+            KindergartenDto dto = MockKindergartenData();
+            var created = await Svc<IKindergartenServices>().Create(dto);
+            Guid id = (Guid)created.Id;
+
+            // Tegevus
+            var result = await Svc<IKindergartenServices>().Delete(id);
+
+            // Kontroll
+            Assert.NotNull(result);
+            Assert.Equal(id, result.Id);
+        }
+
+        // TEST 12
+        [Fact]
+        public async Task Should_CreateTwoDifferentKindergartens_WhenCreateIsCalledTwice()
+        {
+            // Ülesseade
+            KindergartenDto dto1 = MockKindergartenData();
+            KindergartenDto dto2 = MockKindergartenData();
+            dto2.GroupName = "Mesilased";
+
+            // Tegevus
+            var result1 = await Svc<IKindergartenServices>().Create(dto1);
+            var result2 = await Svc<IKindergartenServices>().Create(dto2);
+
+            // Kontroll
+            Assert.NotEqual(result1.Id, result2.Id);
+            Assert.NotEqual(result1.GroupName, result2.GroupName);
+        }
+
+        // TEST 13
+        [Fact]
+        public async Task Should_CreateKindergartenWithCorrectData_WhenAllFieldsAreProvided()
+        {
+            // Ülesseade
+            KindergartenDto dto = new KindergartenDto
+            {
+                GroupName = "Tibud",
+                KindergartenName = "Vikerkaare Lasteaed",
+                TeacherName = "Anna",
+                ChildrenCount = 15,
+                CreatedAt = new DateTime(2025, 3, 1),
+                UpdatedAt = new DateTime(2025, 3, 5)
+            };
+
+            // Tegevus
+            var result = await Svc<IKindergartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.NotNull(result);
+            Assert.Equal("Tibud", result.GroupName);
+            Assert.Equal("Vikerkaare Lasteaed", result.KindergartenName);
+            Assert.Equal("Anna", result.TeacherName);
+            Assert.Equal(15, result.ChildrenCount);
+
+            // Kontrollime, et kuupäevad on määratud
+            Assert.NotEqual(DateTime.MinValue, result.CreatedAt);
+            Assert.NotEqual(DateTime.MinValue, result.UpdatedAt);
+        }
 
         /* üleval testid, all abimeetodid */
 
