@@ -5,12 +5,57 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace TARge25Shop.SeleniumTesting
 {
+    //järjesti klass, mis omab omadusi mille järgi teste saab järjestada
+    public class OrderAttribute : Attribute
+    {
+        public int Value { get; } //väärtus
+        public OrderAttribute(int value) //lihtne omistuskonstruktor
+        {
+            Value = value;
+        }
+    }
+
+    //Xunit järjesti mis implementeerib ITestCaseOrdereri liidesest "OrderTestCases" meetodi, mis on see mis testide käivitamisel
+    //järjestab nad vastavalt "Order" omadusele
+    public class PriorityOrderer : ITestCaseOrderer
+    {
+        //meetod võtab sisse kõik test cased
+        public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases)
+            where TTestCase : ITestCase
+        {
+            //meetod tagastab kõik test cased järjestatuna arendaja defineeritud järjesti järgi.
+            return testCases.OrderBy(test =>
+            {
+                //leitakse omadus                                               omaduse tüüp
+                var method = test.TestMethod.Method.GetCustomAttributes(typeof(OrderAttribute)).FirstOrDefault();
+                //kui ei leita
+                if (method == null)
+                {
+                    //antakse maksimaalne väärtus, ehk test teostatakse kohe, ega ei
+                    //panda teiste pontensiaalselt järjekorras olevate testide vahele
+                    return int.MaxValue;
+                }
+                //kui leitakse
+                else
+                {
+                    //siis tagastatakse omaduse "Order" väärtus
+                    return method.GetNamedArgument<int>(nameof(OrderAttribute.Value));
+                }
+            }).ToList(); //pannakse loendisse, ToList on linq meetod.
+        }
+    }
+    //enne testi klassi kirjeldatakse ära mille järgi testid sorteeritakse
+    //tunnuse "TestCaseOrderer"i järgi. Sulgude vahel esimene väärtus on klassi asukoht ise, teine väärtus on nimeruum kus klass asub.
+    [TestCaseOrderer("TARge25Shop.SeleniumTesting.PriorityOrderer", "TARge25Shop.SeleniumTesting")]
     public class SpaceshipFrontendTests
     {
         [Fact]
+        [Order(1)] //järjesti millel on väärtus "1", järjestatakse väiksem enne.
         public void Should_NavigateToCreate_AddSpaceShip_WithCorrectData_ReturnToIndex()
         {
             //ülesseade
@@ -21,13 +66,13 @@ namespace TARge25Shop.SeleniumTesting
             createInIndex.Click();
 
             //sisestatavad andmed
-            InsertSpaceShipData(driver);
+            InsertSpaceShipData(driver, false);
 
             IWebElement cu_CreateSpaceship = driver.FindElement(By.Id("CU_CreateSpaceship"));
             cu_CreateSpaceship.Click();
 
-            //arvuti tudub
-            Thread.Sleep(1000);
+            ////arvuti tudub
+            //Thread.Sleep(1000);
 
             //andmete kogumine pärast reloadi
             IWebElement indexNameSpaceship = driver.FindElement(By.Id("IndexNameSpaceship"));
@@ -44,6 +89,7 @@ namespace TARge25Shop.SeleniumTesting
         }
 
         [Fact]
+        [Order(2)]
         public void Should_NavigateToDetails_OfASpaceShip_WithPreviouslyCorrectData()
         {
             //ülesseade
@@ -98,6 +144,7 @@ namespace TARge25Shop.SeleniumTesting
         }
 
         [Fact]
+        [Order(3)]
         public void Should_UpdateDetails_OfASpaceShip_WithNewData()
         {
             //ülesseade
@@ -132,9 +179,47 @@ namespace TARge25Shop.SeleniumTesting
             IWebElement cu_CreateSpaceship = driver.FindElement(By.Id("CU_UpdateSpaceship"));
             cu_CreateSpaceship.Click();
 
-            //arvuti tudub
-            Thread.Sleep(1000);
+            ////arvuti tudub
+            //Thread.Sleep(1000);
         }
+
+        [Fact]
+        [Order(4)]
+        public void Should_DeleteSpaceship_FromAppVIADeleteView()
+        {
+            //ülesseade
+            IWebDriver driver = SetupAndNavigateSIndex();
+
+            //otsime üles kõik tabeli read, rida htmli tabelis tähistatakse "tr"iga
+            //ICollection<IWebElement> table = driver.FindElements(By.TagName("tr"));
+            var table = driver.FindElement(By.Id("IndexTable"));
+            List<IWebElement> rows = table.FindElements(By.TagName("tr")).ToList();
+            rows.RemoveAt(0);
+            //tsükkel käib kõik read läbi
+
+            foreach (var row in rows)
+            {
+
+                var locatedelement = row.FindElement(By.Id("IndexNameSpaceship"));
+                if (locatedelement.Text == "DISISENJUNAEM")
+                {
+                    //siis vajuta selles reas asuvat details nuppu
+                    var rowelement = row.FindElement(By.Id("IndexActionsSpaceship"));
+                    var button = rowelement.FindElement(By.Id("IndexSpaceshipDelete"));
+                    button.Click();
+                    //pärast õiget vajutust, tsükkel katkestatakse
+                    //arvuti tudub
+                    Thread.Sleep(500);
+                    break;
+                }
+            }
+            var clickthisbutton = driver.FindElement(By.Id("Delete_Delete"));
+            clickthisbutton.Click();
+
+            int rowCount = table.FindElements(By.TagName("tr")).ToList().Count();
+            Assert.True(rowCount < 2);
+        }
+
 
         private static IWebDriver SetupAndNavigateSIndex()
         {

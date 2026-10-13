@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TARge25Shop.Core.Dto;
 using TARge25Shop.Core.ServiceInterface;
+using TARge25Shop.Data;
 using Xunit;
 
 namespace TARge25Shop.SpaceshipTest
@@ -11,7 +12,7 @@ namespace TARge25Shop.SpaceshipTest
     public class SpaceshipTest : TestBase
     {
 
-        [Fact] 
+        [Fact]
         // Fact tähistab ära ühte testi xUnit raamistikus
         // 1 - Kirjeldatakse ära kas test on tavaline, või negatiivne.
         // 2 - Kirjeldatakse ära mida parasjagu üritatakse testialuse objektiga teha
@@ -25,8 +26,8 @@ namespace TARge25Shop.SpaceshipTest
         public async Task ShouldNot_AddEmptySpaceShip_WhenResultIsReturned()
         {
             // Ülesseade
-            SpaceshipDto dto = new SpaceshipDto() 
-            { 
+            SpaceshipDto dto = new SpaceshipDto()
+            {
                 Name = "X AE a L 12 menuornvöerv",
                 ShipType = "lendav taldrik",
                 Crew = 67,
@@ -111,20 +112,13 @@ namespace TARge25Shop.SpaceshipTest
         public async Task Should_UpdateSpaceshipByID_WhenUpdatingData()
         {
             //ülesseade
-
-            //add new object,
-            //extract id from result
-            //update new object by result id
-
             SpaceshipDto dto = MockSpaceshipData();
             var result = await Svc<ISpaceshipServices>().Create(dto);
-            var guid = new Guid("68eb8abd-086a-4c8b-9695-71234143f709");
 
-
-            
+            Guid guid = (Guid)result.Id;
             SpaceshipDto domain = new();
 
-            domain.Id = Guid.Parse("68eb8abd-086a-4c8b-9695-71234143f709");
+            domain.Id = guid;
             domain.EnginePower = 10000000;
             domain.Name = "Igor Mang 2";
             domain.ShipType = "püramiid";
@@ -133,17 +127,19 @@ namespace TARge25Shop.SpaceshipTest
             domain.UpdatedAt = DateTime.UtcNow;//  <-- PEAB muutuma Update korral
 
             //tegevus
-            await Svc<ISpaceshipServices>().Update(dto);
+            await Svc<ISpaceshipServices>().Update(domain);
+            //kill first connection: added tracker clearing to update
+            Svc<TARge25ShopContext>().ChangeTracker.Clear();
             var result2 = await Svc<ISpaceshipServices>().DetailAsync(guid);
 
             //kontroll
-            Assert.Equal(domain.Id, guid);
-            Assert.NotEqual(dto.EnginePower, domain.EnginePower);
-            Assert.NotEqual(dto.Name, domain.Name);
-            Assert.DoesNotMatch(dto.Crew.ToString(), domain.Crew.ToString());
-            Assert.DoesNotMatch(dto.ShipType, domain.ShipType);
-            Assert.Equal(dto.CreatedAt, domain.CreatedAt);
-            Assert.NotEqual(dto.UpdatedAt, domain.CreatedAt);
+            Assert.Equal(result.Id, result2.Id);
+            Assert.NotEqual(dto.EnginePower, result2.EnginePower);
+            Assert.NotEqual(dto.Name, result2.Name);
+            Assert.DoesNotMatch(dto.Crew.ToString(), result2.Crew.ToString());
+            Assert.DoesNotMatch(dto.ShipType, result2.ShipType);
+            Assert.Equal(dto.CreatedAt, result2.CreatedAt);
+            Assert.NotEqual(dto.UpdatedAt, result2.CreatedAt);
         }
         [Fact]
         public async Task ShouldNot_UpdateSpaceshipByID_WhenNoDataIsUpdated()
