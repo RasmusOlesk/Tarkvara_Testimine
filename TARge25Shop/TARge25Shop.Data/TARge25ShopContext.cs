@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TARge25Shop.Core.Domain;
-using TARge25Shop.Data.Migrations;
 using TARge25SHop.Core.Domain;
 
 

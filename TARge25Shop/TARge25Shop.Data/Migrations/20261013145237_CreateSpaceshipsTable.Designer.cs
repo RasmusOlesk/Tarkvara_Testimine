@@ -12,8 +12,8 @@ using TARge25Shop.Data;
 namespace TARge25Shop.Data.Migrations
 {
     [DbContext(typeof(TARge25ShopContext))]
-    [Migration("20261011202949_FileDatabase")]
-    partial class FileDatabase
+    [Migration("20261013145237_CreateSpaceshipsTable")]
+    partial class CreateSpaceshipsTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,23 @@ namespace TARge25Shop.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FileToDatabases");
+                });
+
+            modelBuilder.Entity("TARge25Shop.Core.Domain.FileToApi", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ExistingFilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("SpaceshipId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FileToApis");
                 });
 
             modelBuilder.Entity("TARge25Shop.Core.Domain.Kindergarten", b =>
@@ -75,6 +92,37 @@ namespace TARge25Shop.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Kindergartens");
+                });
+
+            modelBuilder.Entity("TARge25Shop.Core.Domain.Spaceship", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Crew")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EnginePower")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShipType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Spaceships");
                 });
 #pragma warning restore 612, 618
         }
