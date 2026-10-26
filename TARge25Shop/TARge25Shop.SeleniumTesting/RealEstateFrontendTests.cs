@@ -69,7 +69,7 @@ namespace TARge25Shop.SeleniumTesting
             createInIndex.Click();
 
             //sisestatavad andmed, siin tagastub ka kasutatud nimi
-            string concreteName = InsertSpaceShipData_ReturnName(driver, false);
+            string concreteName = InsertRealEstateData_ReturnName(driver, false);
             thisRunGuid = concreteName;
 
             IWebElement cu_CreateRealEstate = driver.FindElement(By.Id("CU_CreateRealEstate"));
@@ -82,10 +82,10 @@ namespace TARge25Shop.SeleniumTesting
             var tableOfIndex = driver.FindElement(By.Id("IndexTable"));
             List<IWebElement> rowsOfTable = tableOfIndex.FindElements(By.TagName("tr")).ToList();
             rowsOfTable.RemoveAt(0);
-            string spaceShipNameData = "";
-            string spaceShipTypeData = "";
-            string spaceShipCrewData = "";
-            string spaceShipBuiltAtData = "";
+            string RealEstateAreaData = "";
+            string RealEstateLocationData = "";
+            string RealEstateRoomNumberData = "";
+            string RealEstateCreatedAtData = "";
             //IWebElement indexNameSpaceship = driver.FindElement(By.Id("IndexNameSpaceship"));
             //var spaceShipNameData = indexNameSpaceship.Text;
             //IWebElement indexTypeSpaceship = driver.FindElement(By.Id("IndexTypeSpaceship"));
@@ -98,10 +98,10 @@ namespace TARge25Shop.SeleniumTesting
                 if (row.FindElement(By.Id("IndexNameRealEstate")).Text == thisRunGuid)
                 {
                     doesItExist = true;
-                    spaceShipNameData = thisRunGuid;
-                    spaceShipTypeData = row.FindElement(By.Id("IndexTypeSpaceship")).Text;
-                    spaceShipCrewData = row.FindElement(By.Id("IndexCrewSpaceship")).Text;
-                    spaceShipBuiltAtData = row.FindElement(By.Id("IndexBuiltDateSpaceship")).Text;
+                    RealEstateAreaData = thisRunGuid;
+                    RealEstateLocationData = row.FindElement(By.Id("IndexLocationRealEstate")).Text;
+                    RealEstateRoomNumberData = row.FindElement(By.Id("IndexRoomNumberRealEstate")).Text;
+                    RealEstateCreatedAtData = row.FindElement(By.Id("IndexCreatedDataRealEstate")).Text;
                     break;
                 }
             }
@@ -110,12 +110,12 @@ namespace TARge25Shop.SeleniumTesting
             //kontroll
             //Assert.True(concreteName == indexNameSpaceship.Text);
             Assert.True(true == doesItExist);
-            Assert.Equal(spaceShipNameData, thisRunGuid);
-            Assert.True(spaceShipTypeData == "i add ship type for spaceship");
-            Assert.Equal(spaceShipCrewData, "12345");
-            Assert.True((thisRunGuid == spaceShipNameData)
-                && ("i add ship type for spaceship" == spaceShipTypeData)
-                && ("12345" == spaceShipCrewData));
+            Assert.Equal(RealEstateAreaData, thisRunGuid);
+            Assert.True(RealEstateLocationData == "i add location for RealEstate");
+            Assert.Equal(RealEstateRoomNumberData, "12345");
+            Assert.True((thisRunGuid == RealEstateAreaData)
+                && ("i add location for RealEstate" == RealEstateLocationData)
+                && ("12345" == RealEstateRoomNumberData));
         }
 
 
