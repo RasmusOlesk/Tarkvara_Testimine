@@ -219,7 +219,7 @@ namespace TARge25Shop.SeleniumTesting
             InsertKindergartenData(driver, thisRunGuid, true);
 
             IWebElement cu_CreateKindergarten = driver.FindElement(By.Id("CU_UpdateKindergarten"));
-            cu_CreateSpaceship.Click();
+            cu_CreateKindergarten.Click();
 
             //andmete kogumine pärast reloadi
             var tableOfIndex = driver.FindElement(By.Id("IndexTable"));
