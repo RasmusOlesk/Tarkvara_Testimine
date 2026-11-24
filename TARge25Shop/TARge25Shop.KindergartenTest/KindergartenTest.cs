@@ -13,18 +13,8 @@ namespace TARge25Shop.KindergartenTest
 {
     public class KindergartenTest : TestBase
     {
-
+        // Kontrollib, et loomine tagastab lasteaia objekti, mitte tühja vastuse.
         [Fact]
-        // Fact tähistab ära ühte testi xUnit raamistikus
-        // 1 - Kirjeldatakse ära kas test on tavaline, või negatiivne.
-        // 2 - Kirjeldatakse ära mida parasjagu üritatakse testialuse objektiga teha
-        // 3 - Mis tingimustel tulemust kontrollitakse, peale tegevust
-        //
-        // Selles testis kontrollitakse et (2) Kosmoselaeva lisamisel
-        // (1) Ei tohiks (3) saadud tulemus olla tühi. Jälgi seda sõnastusviisi:
-        //
-        //                  1           2               3
-        //                  \/          \/              \/
         public async Task ShouldNot_AddEmptyKindergarten_WhenResultIsReturned()
         {
             // Ülesseade
@@ -44,11 +34,8 @@ namespace TARge25Shop.KindergartenTest
             // kontroll
             Assert.NotNull(result);
         }
-        // Selles testis kontrollitakse et (2) Spaceshipi päring andmebaasist
-        // (1) ei tohiks tagastada objekti (3) kui ID-d ei ole samad:
-        //
-        //                  1           2               3
-        //                  \/          \/              \/
+
+        // Kontrollib, et kaks erinevat ID-d ei ole võrdsed.
         [Fact]
         public async Task ShouldNot_GetKindergartenID_WhenIDNotEqual()
         {
@@ -62,8 +49,8 @@ namespace TARge25Shop.KindergartenTest
             // kontroll
             Assert.NotEqual(wrongGuid, goodGuid);
         }
-        // Seleta kodus lahti, nagu eelnevate testide laused, eesti keelde, selle testi oma ka.
-        // Selles testis kontrollitakse et kosmoselaeva päringul andmebaasist peaks tagastama objekti siis kui ID on sama
+
+        // Kontrollib, et päringus kasutatud ID ja oodatud ID on samad.
         [Fact]
         public async Task Should_GetKindergartenByID_WhenGuidIsEqual()
         {
@@ -78,8 +65,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal(databaseGuid, seekGuid);
         }
 
-        // Seleta kodus lahti, nagu eelnevate testide laused, eesti keelde, selle testi oma ka.
-        // Selles testis kontrollitakse et kosmoselaeva kustutamisel andmebaasist peaks kustuma objekt kui tagastatav väärtus on sama
+        // Kontrollib, et kustutamise vastusel on loodud lasteaiaga sama ID.
         [Fact]
         public async Task Should_KindergartenDeletedByID_WhenReturnedResultIsEqual()
         {
@@ -94,6 +80,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal(addKindergarten.Id, deleteKindergarten.Id);
         }
 
+        // Kontrollib, et kustutamise tulemus ei viita teisele loodud lasteaiale.
         [Fact]
         public async Task ShouldNot_DeleteKindergartenByID_WhenDidNotDeleteKindergarten()
         {
@@ -109,29 +96,27 @@ namespace TARge25Shop.KindergartenTest
             //kontroll
             Assert.NotEqual(Kindergarten1.Id, result.Id);
         }
-        // test mis kontrollib, et spaceshipi uuendatakse, uute andmete korral
+        // test mis kontrollib, et kindergarteni uuendatakse, uute andmete korral
         [Fact]
         public async Task Should_UpdateKindergartenByID_WhenUpdatingData()
         {
-            // 1. Ülesseade - loome uue lasteaia andmete objekti
+            // loob uue lasteaia andmete objekti
             KindergartenDto dto = MockKindergartenData();
 
-            // Salvestame objekti andmebaasi, mis genereerib talle tegeliku unikaalse ID
+            // Salvestab objekti andmebaasi, mis genereerib talle unikaalse ID
             var result = await Svc<IKindergartenServices>().Create(dto);
             Guid guid = (Guid)result.Id;
 
-            // --- PARANDUS EF CORE KONFLIKTI VASTU ---
-            // Küsime andmebaasi konteksti otse välja ja eemaldame (detach) äsja loodud objekti vahemälust,
-            // et järgnev Update teenus ei tekitaks identiteedi konflikti.
+            
             var dbContext = Svc<TARge25ShopContext>();
             var trackedEntity = dbContext.Kindergartens.Local.FirstOrDefault(x => x.Id == guid);
             if (trackedEntity != null)
             {
                 dbContext.Entry(trackedEntity).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
             }
-            // ----------------------------------------
+            
 
-            // 2. Tegevus - Valmistame ette andmed uuendamiseks, kasutades tegelikku ID-d
+            // Valmistab ette andmed uuendamiseks, kasutades ID-d
             KindergartenDto updateDto = new();
             updateDto.Id = guid;
             updateDto.GroupName = "Blue";
@@ -141,13 +126,13 @@ namespace TARge25Shop.KindergartenTest
             updateDto.CreatedAt = result.CreatedAt;
             updateDto.UpdatedAt = DateTime.UtcNow;
 
-            // Käivitame teenuse uuendamise
+            // Käivitab teenuse uuendamise
             await Svc<IKindergartenServices>().Update(updateDto);
 
-            // Küsime andmebaasist uuesti selle sama ID-ga andmed, et kontrollida muudatusi
+            // Küsib andmebaasist uuesti selle sama ID-ga andmed, et kontrollida muudatusi
             var updatedResult = await Svc<IKindergartenServices>().DetailAsync(guid);
 
-            // 3. Kontroll
+            //  Kontroll
             Assert.Equal(updatedResult.Id, guid);
             Assert.Equal("Blue", updatedResult.GroupName);
             Assert.Equal("püramiid", updatedResult.KindergartenName);
@@ -157,6 +142,7 @@ namespace TARge25Shop.KindergartenTest
 
 
 
+        // Kontrollib, et tühjade andmetega uuendamine ei tagasta loodud lasteaia ID-d.
         [Fact]
         public async Task ShouldNot_UpdateKindergartenByID_WhenNoDataIsUpdated()
         {
@@ -171,8 +157,8 @@ namespace TARge25Shop.KindergartenTest
             //kontroll
             Assert.NotEqual(createdKindergarten.Id, result.Id);
         }
-        //kuna mootor ei saa olla negatiivse võimsusega, kontrollime et ei saaks
-        //lisada võimetut mootorit ega negatiivse võimsusega mootorit
+        
+        // Kontrollib, et loomise järel on vastuses laste arv positiivne.
         [Fact]
         public async Task ShouldNot_CreateKindergartenWithNegativeChildrenCount_WhenChildrenCountNegative()
         {
@@ -187,9 +173,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.True(result.ChildrenCount > 0);
         }
 
-        //test mis kontrollib, et meeskond on suurem kui 3 liiget,
-        //service ei tohi lisada sellest vähema arvuga objekti, service
-        //võib selle probleemi lahendada ükskõik kuidas
+        // Kontrollib, et loomise järel oleks laste arv suurem kui kolm.
         [Fact]
         public async Task ShouldNot_CreateKindergarten_WhenChildrenCountIsThreeOrLess()
         {
@@ -202,6 +186,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.True(result.ChildrenCount > 3);
         }
 
+        // Kontrollib, et kustutatud lasteaeda ei saa enam ID järgi kätte.
         [Fact]
         public async Task Should_RemoveKindergartenFromDatabase_WhenKindergartenIsDeleted()
         {
@@ -218,6 +203,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Null(result);
         }
 
+        // Kontrollib, et teise lasteaia kustutamine jätab esimese alles.
         [Fact]
         public async Task ShouldNot_RemoveKindergartenFromDatabase_WhenKindergartenIdIsDifferent()
         {
@@ -235,10 +221,7 @@ namespace TARge25Shop.KindergartenTest
 
 
 
-        /// <summary>
-        /// Returns a nulled object for testing purposes
-        /// </summary>
-        /// <returns></returns>
+        
         private KindergartenDto MockKindergartenNullData()
         {
             return new KindergartenDto
@@ -255,6 +238,7 @@ namespace TARge25Shop.KindergartenTest
 
         //ISESEISVALT TEHTUD TESTID
 
+        // Kontrollib, et vähemalt kolme lapsega lasteaia loomisel säilib laste arv.
         [Fact]
         public async Task Should_CreateKindergarten_WhenChildrenCountIsThreeOrMore()
         {
@@ -269,6 +253,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.True(result.ChildrenCount >= 3);
         }
 
+        // Kontrollib, et positiivne laste arv jääb loomisel positiivseks.
         [Fact]
         public async Task Should_CreateKindergartenWithPositiveChildrenCount_WhenChildrenCountPositive()
         {
@@ -283,7 +268,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.True(result.ChildrenCount > 0);
         }
 
-        // TEST 1
+        // Kontrollib, et rühma nimi salvestub lasteaia loomisel õigesti.
         [Fact]
         public async Task Should_CreateKindergarten_WhenGroupNameIsProvided()
         {
@@ -298,7 +283,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal("Bumblebee", result.GroupName);
         }
 
-        // TEST 2
+        // Kontrollib, et lasteaia nimi salvestub loomisel õigesti.
         [Fact]
         public async Task Should_CreateKindergarten_WhenKindergartenNameIsProvided()
         {
@@ -313,7 +298,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal("Place", result.KindergartenName);
         }
 
-        // TEST 3
+        // Kontrollib, et õpetaja nimi salvestub loomisel õigesti.
         [Fact]
         public async Task Should_CreateKindergarten_WhenTeacherNameIsProvided()
         {
@@ -328,7 +313,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal("Peedu", result.TeacherName);
         }
 
-        // TEST 4
+        // Kontrollib, et kümne lapse arv säilib loomise järel.
         [Fact]
         public async Task Should_CreateKindergarten_WhenChildrenCountIsTen()
         {
@@ -343,7 +328,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal(10, result.ChildrenCount);
         }
 
-        // TEST 5
+        // Kontrollib, et loodud lasteaial oleks loomise kuupäev määratud.
         [Fact]
         public async Task Should_CreateKindergarten_WhenCreatedAtIsProvided()
         {
@@ -357,7 +342,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.NotEqual(DateTime.MinValue, result.CreatedAt);
         }
 
-        // TEST 6
+        // Kontrollib, et loodud lasteaial oleks muutmise kuupäev määratud.
         [Fact]
         public async Task Should_CreateKindergarten_WhenUpdatedAtIsProvided()
         {
@@ -371,7 +356,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.NotEqual(DateTime.MinValue, result.UpdatedAt);
         }
 
-        // TEST 7
+        // Kontrollib, et olemasoleva lasteaia leiab tema ID järgi.
         [Fact]
         public async Task Should_GetKindergartenByID_WhenKindergartenExists()
         {
@@ -388,7 +373,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal(created.Id, result.Id);
         }
 
-        // TEST 8
+        // Kontrollib, et leitud lasteaial oleks õige rühma nimi.
         [Fact]
         public async Task Should_GetKindergartenWithCorrectGroupName_WhenKindergartenExists()
         {
@@ -405,7 +390,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal("Bugs", result.GroupName);
         }
 
-        // TEST 9
+        // Kontrollib, et õpetaja nime uuendamine salvestub.
         [Fact]
         public async Task Should_UpdateKindergartenTeacherName_WhenTeacherNameChanges()
         {
@@ -444,7 +429,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal("Aadu", result.TeacherName);
         }
 
-        // TEST 10
+        // Kontrollib, et laste arvu uuendamine salvestub.
         [Fact]
         public async Task Should_UpdateKindergartenChildrenCount_WhenChildrenCountChanges()
         {
@@ -482,7 +467,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal(25, result.ChildrenCount);
         }
 
-        // TEST 11
+        // Kontrollib, et kehtiva ID-ga lasteaia kustutamine tagastab kustutatud objekti.
         [Fact]
         public async Task Should_DeleteKindergarten_WhenValidIDIsProvided()
         {
@@ -499,7 +484,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.Equal(id, result.Id);
         }
 
-        // TEST 12
+        // Kontrollib, et kaks loomiskutset loovad erineva ID ja rühma nimega lasteaiad.
         [Fact]
         public async Task Should_CreateTwoDifferentKindergartens_WhenCreateIsCalledTwice()
         {
@@ -517,7 +502,7 @@ namespace TARge25Shop.KindergartenTest
             Assert.NotEqual(result1.GroupName, result2.GroupName);
         }
 
-        // TEST 13
+        // Kontrollib, et kõik antud lasteaia andmed jõuavad loodud objekti.
         [Fact]
         public async Task Should_CreateKindergartenWithCorrectData_WhenAllFieldsAreProvided()
         {
